@@ -258,8 +258,25 @@ export const prepareWAMessageMedia = async(
 	}
 
 	if(cacheableKey) {
+		// set cache
 		logger?.debug({ cacheableKey }, 'setting cache')
-		await options.mediaCache!.set(cacheableKey, WAProto.Message.encode(obj).finish())
+		const encImg = WAProto.Message.fromObject({
+			[`${mediaType}Message`]: MessageTypeProto[mediaType].fromObject(
+				{
+					url: mediaUrl,
+					directPath,
+					mediaKey,
+					fileEncSha256,
+					fileSha256,
+					fileLength,
+					mediaKeyTimestamp: unixTimestampSeconds(),
+					...uploadData,
+					media: undefined
+				}
+			)
+		})
+		await options.mediaCache!.set(cacheableKey, WAProto.Message.encode(encImg).finish())
+
 	}
 
 	return obj
