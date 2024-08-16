@@ -150,7 +150,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			const user = jidDecode(jid)?.user
 			jid = jidNormalizedUser(jid)
 
-			const devices = userDevicesCache.get<JidWithDevice[]>(user!)
+			const devices = await userDevicesCache!.get<JidWithDevice[]>(user!)
 			if(devices && useCache) {
 				deviceResults.push(...devices)
 
@@ -596,12 +596,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			return 'livelocation'
 		} else if(message.stickerMessage) {
 			return 'sticker'
-		} else if(message.listMessage) {
-			return 'list'
-		} else if(message.listResponseMessage) {
-			return 'list_response'
-		} else if(message.buttonsResponseMessage) {
-			return 'buttons_response'
 		} else if(message.orderMessage) {
 			return 'order'
 		} else if(message.productMessage) {

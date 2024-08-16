@@ -8,19 +8,20 @@ import { AuthenticationState, SignalAuthState, TransactionCapabilityOptions } fr
 import { GroupMetadata } from './GroupMetadata'
 import { MediaConnInfo } from './Message'
 import { SignalRepository } from './Signal'
+import NodeCache from 'node-cache'
 
 export type WAVersion = [number, number, number]
 export type WABrowserDescription = [string, string, string]
 
 export type CacheStore = {
     /** get a cached key and change the stats */
-    get<T>(key: string): T | undefined
+    get<T>(key: string): Promise<T> | undefined
     /** set a key in the cache */
-    set<T>(key: string, value: T): void
+    set<T>(key: string, value: T): Promise<void> | unknown
     /** delete a key from the cache */
-    del(key: string): void
-    /** flush all data */
-    flushAll(): void
+    del(key: string): Promise<void> | unknown
+    /** flush all keys from the cache */
+    flushAll(): Promise<void> | unknown
 }
 
 export type SocketConfig = {

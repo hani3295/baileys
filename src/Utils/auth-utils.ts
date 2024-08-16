@@ -30,10 +30,10 @@ export function makeCacheableSignalKeyStore(
 
 	return {
 		async get(type, ids) {
-			const data: { [_: string]: SignalDataTypeMap[typeof type] } = { }
+			const data: { [_: string]: SignalDataTypeMap[typeof type] } =  { }
 			const idsToFetch: string[] = []
 			for(const id of ids) {
-				const item = cache.get<SignalDataTypeMap[typeof type]>(getUniqueId(type, id))
+				const item = await cache!.get<SignalDataTypeMap[typeof type]>(getUniqueId(type, id))
 				if(typeof item !== 'undefined') {
 					data[id] = item
 				} else {

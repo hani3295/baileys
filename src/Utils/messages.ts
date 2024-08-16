@@ -137,7 +137,7 @@ export const prepareWAMessageMedia = async(
 
 	// check for cache hit
 	if(cacheableKey) {
-		const mediaBuff = options.mediaCache!.get<Buffer>(cacheableKey)
+		const mediaBuff = await options.mediaCache!.get<Buffer>(cacheableKey)
 		if(mediaBuff) {
 			logger?.debug({ cacheableKey }, 'got media cache hit')
 
@@ -258,8 +258,8 @@ export const prepareWAMessageMedia = async(
 	}
 
 	if(cacheableKey) {
-		logger?.debug({ cacheableKey }, 'set cache')
-		options.mediaCache!.set(cacheableKey, WAProto.Message.encode(obj).finish())
+		logger?.debug({ cacheableKey }, 'setting cache')
+		await options.mediaCache!.set(cacheableKey, WAProto.Message.encode(obj).finish())
 	}
 
 	return obj
@@ -338,7 +338,6 @@ export const generateWAMessageContent = async(
 			extContent.description = urlInfo.description
 			extContent.title = urlInfo.title
 			extContent.previewType = 0
-
 			const img = urlInfo.highQualityThumbnail
 			if(img) {
 				extContent.thumbnailDirectPath = img.directPath
@@ -350,6 +349,7 @@ export const generateWAMessageContent = async(
 				extContent.thumbnailEncSha256 = img.fileEncSha256
 			}
 		}
+		urlInfo = null
 
 		if(options.backgroundColor) {
 			extContent.backgroundArgb = await assertColor(options.backgroundColor)

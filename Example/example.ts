@@ -1,11 +1,12 @@
 import { Boom } from '@hapi/boom'
 import NodeCache from 'node-cache'
 import readline from 'readline'
-import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, downloadAndProcessHistorySyncNotification, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, getHistoryMsg, isJidNewsletter, makeCacheableSignalKeyStore, makeInMemoryStore, PHONENUMBER_MCC, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
+import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, downloadAndProcessHistorySyncNotification, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, getHistoryMsg, isJidBroadcast, isJidNewsletter, makeCacheableSignalKeyStore, makeInMemoryStore, PHONENUMBER_MCC, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
 //import MAIN_LOGGER from '../src/Utils/logger'
 import open from 'open'
-import fs from 'fs'
-import P from 'pino'
+import fs, { readFileSync } from 'fs'
+import P, { pino } from 'pino'
+
 
 const logger = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` }, P.destination('./wa-logs.txt'))
 logger.level = 'trace'
@@ -42,22 +43,39 @@ const startSock = async() => {
 	console.log(`using WA v${version.join('.')}, isLatest: ${isLatest}`)
 
 	const sock = makeWASocket({
-		version,
-		logger,
-		printQRInTerminal: !usePairingCode,
-		mobile: useMobile,
-		auth: {
-			creds: state.creds,
-			/** caching makes the store faster to send/recv messages */
-			keys: makeCacheableSignalKeyStore(state.keys, logger),
-		},
-		msgRetryCounterCache,
-		generateHighQualityLinkPreview: true,
-		// ignore all broadcast messages -- to receive the same
-		// comment the line below out
-		// shouldIgnoreJid: jid => isJidBroadcast(jid),
-		// implement to handle retries & poll updates
-		getMessage,
+		    printQRInTerminal: !usePairingCode,
+            browser: ['skid bot', 'safari', 'chrome'],
+			auth: { creds: state.creds, keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "silent" }).child({ level: "silent" })) },
+            logger,
+            waWebSocketUrl: 'wss://web.whatsapp.com/ws/chat?ED=CAIICA',
+            version,
+            msgRetryCounterCache: new NodeCache({ stdTTL: 0 }),
+            mediaCache: new NodeCache({ stdTTL: 0 }),
+            markOnlineOnConnect: false,
+            syncFullHistory: false,
+            linkPreviewImageThumbnailWidth: 1980,
+            userDevicesCache: new NodeCache({ stdTTL: 0 }),
+            shouldSyncHistoryMessage: () => false,
+            generateHighQualityLinkPreview: true,
+            shouldIgnoreJid: jid => isJidBroadcast(jid),
+            customUploadHosts: [],
+            defaultQueryTimeoutMs: 60000,
+            fireInitQueries: true,
+            placeholderResendCache: new NodeCache({ stdTTL: 0 }),
+            qrTimeout: 60000,
+            appStateMacVerification: {
+                patch: true,
+                snapshot: true
+            },
+            callOfferCache: new NodeCache({ stdTTL: 0 }),
+            connectTimeoutMs: 60000,
+            
+            patchMessageBeforeSending: async (message) => {
+                let messages = 0
+                sock.uploadPreKeysToServerIfRequired()
+                messages++
+                return message
+            },
 	})
 
 	store?.bind(sock.ev)
@@ -303,6 +321,7 @@ const startSock = async() => {
 								console.log('requested on-demand sync, id=', messageId)
 							}
 						}
+						await sock.sendMessage(msg.key.remoteJid!, { image: readFileSync('./media/cat.jpeg')})
 
 						if(!msg.key.fromMe && doReplies && !isJidNewsletter(msg.key?.remoteJid!)) {
 
