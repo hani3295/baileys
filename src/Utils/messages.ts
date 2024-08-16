@@ -326,7 +326,7 @@ export const generateWAMessageContent = async(
 	if('text' in message) {
 		const extContent = { text: message.text } as WATextMessage
 
-		let urlInfo = message.linkPreview
+		const urlInfo = message.linkPreview
 		if(typeof urlInfo === 'undefined') {
 			urlInfo = await generateLinkPreviewIfRequired(message.text, options.getUrlInfo, options.logger)
 		}
@@ -349,7 +349,7 @@ export const generateWAMessageContent = async(
 				extContent.thumbnailEncSha256 = img.fileEncSha256
 			}
 		}
-		urlInfo = null
+
 
 		if(options.backgroundColor) {
 			extContent.backgroundArgb = await assertColor(options.backgroundColor)
