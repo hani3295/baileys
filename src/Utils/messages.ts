@@ -326,7 +326,7 @@ export const generateWAMessageContent = async(
 	if('text' in message) {
 		const extContent = { text: message.text } as WATextMessage
 
-		const urlInfo = message.linkPreview
+		let urlInfo = message.linkPreview
 		if(typeof urlInfo === 'undefined') {
 			urlInfo = await generateLinkPreviewIfRequired(message.text, options.getUrlInfo, options.logger)
 		}
