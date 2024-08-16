@@ -160,6 +160,7 @@ export const decryptMessageNode = (
 							break
 						case 'pkmsg':
 						case 'msg':
+						case 'msmsg':
 							const user = isJidUser(sender) ? sender : author
 							msgBuffer = await repository.decryptMessage({
 								jid: user,

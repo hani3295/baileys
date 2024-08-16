@@ -5,6 +5,7 @@ import { SignalRepository } from '../Types/Signal'
 import { generateSignalPubKey } from '../Utils'
 import { jidDecode } from '../WABinary'
 
+
 export function makeLibSignalRepository(auth: SignalAuthState): SignalRepository {
 	const storage = signalStorage(auth)
 	return {
@@ -35,6 +36,7 @@ export function makeLibSignalRepository(auth: SignalAuthState): SignalRepository
 				result = await session.decryptPreKeyWhisperMessage(ciphertext)
 				break
 			case 'msg':
+			case 'msmsg':
 				result = await session.decryptWhisperMessage(ciphertext)
 				break
 			}

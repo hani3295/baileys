@@ -719,6 +719,11 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 	}
 
 	const handleMessage = async(node: BinaryNode) => {
+		if(node.attrs.offline) {
+			logger.debug({ key: node.attrs.key }, 'ignoring offline message')
+			await sendMessageAck(node)
+			return
+		}
 		if(shouldIgnoreJid(node.attrs.from) && node.attrs.from !== '@s.whatsapp.net') {
 			logger.debug({ key: node.attrs.key }, 'ignored message')
 			await sendMessageAck(node)
