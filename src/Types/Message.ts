@@ -22,6 +22,7 @@ export type WAGenericMediaMessage = proto.Message.IVideoMessage | proto.Message.
 export import WAMessageStubType = proto.WebMessageInfo.StubType
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 export import WAMessageStatus = proto.WebMessageInfo.Status
+import { BinaryNode } from '../WABinary'
 export type WAMediaUpload = Buffer | { url: URL | string } | { stream: Readable }
 /** Set of message types that are supported by the library */
 export type MessageType = keyof proto.Message
@@ -92,6 +93,7 @@ export type PollMessageOptions = {
     name: string
     selectableCount?: number
     values: string[]
+    toAnnouncementGroup?: boolean
     /** 32 byte message secret to encrypt poll selections */
     messageSecret?: Uint8Array
 }
@@ -206,6 +208,8 @@ export type MessageRelayOptions = MinimalRelayOptions & {
     participant?: { jid: string, count: number }
     /** additional attributes to add to the WA binary node */
     additionalAttributes?: { [_: string]: string }
+    /** add additional nodes to the binary node */
+    additionalNodes?: BinaryNode[]
     /** should we use the devices cache, or fetch afresh from the server; default assumed to be "true" */
     useUserDevicesCache?: boolean
     /** jid list of participants for status@broadcast */

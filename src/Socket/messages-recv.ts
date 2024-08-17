@@ -307,6 +307,11 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			msg.messageStubType = WAMessageStubType.GROUP_CHANGE_INVITE_LINK
 			msg.messageStubParameters = [ child.attrs.code ]
 			break
+		case 'description':
+			const description = getBinaryNodeChild(child, 'body')?.content?.toString()
+			msg.messageStubType = WAMessageStubType.GROUP_CHANGE_DESCRIPTION
+			msg.messageStubParameters = description ? [ description ] : undefined
+			break
 		case 'member_add_mode':
 			const addMode = child.content
 			if(addMode) {
@@ -589,12 +594,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			await sendMessageAck(node)
 			return
 		}
-		if (config.shouldIgnoreOfflineMessages && node.attrs.offline) {
-			await sendMessageAck(node)
-			logger.debug({ key: node.attrs.key }, 'ignoring receipt for offline message')
-			return
 
-		}
 
 		const ids = [attrs.id]
 		if(Array.isArray(content)) {

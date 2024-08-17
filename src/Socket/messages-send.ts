@@ -311,7 +311,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 	const relayMessage = async(
 		jid: string,
 		message: proto.IMessage,
-		{ messageId: msgId, participant, additionalAttributes, useUserDevicesCache, cachedGroupMetadata, statusJidList }: MessageRelayOptions
+		{ messageId: msgId, participant, additionalAttributes, additionalNodes, useUserDevicesCache, cachedGroupMetadata, statusJidList }: MessageRelayOptions
 	) => {
 		const meId = authState.creds.me!.id
 
@@ -539,12 +539,16 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 					logger.debug({ jid }, 'adding business node')
 				}
+				if(additionalNodes && additionalNodes.length > 0) {
+					(stanza.content as BinaryNode[]).push(...additionalNodes)
+				}
 
 				logger.debug({ msgId }, `sending message to ${participants.length} devices`)
 
 				await sendNode(stanza)
 			}
 		)
+		
 
 		return msgId
 	}
