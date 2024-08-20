@@ -48,6 +48,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 		maxMsgRetryCount,
 		getMessage,
 		shouldIgnoreJid,
+		shouldIgnoreOfflineMessages
 	} = config
 	const sock = makeMessagesSocket(config)
 	const {
@@ -210,6 +211,11 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 				logger.info({ msgAttrs: node.attrs, retryCount }, 'sent retry receipt')
 			}
 		)
+	}
+	const handleNewsLetter = async(node: BinaryNode) => {
+		logger.info({ node }, 'recv news letter')
+		const id = node.attrs.server_id
+		
 	}
 
 	const handleEncryptNotification = async(node: BinaryNode) => {
@@ -667,8 +673,13 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 
 	const handleNotification = async(node: BinaryNode) => {
 		const remoteJid = node.attrs.from
-		if(shouldIgnoreJid(remoteJid) && node.attrs.offline) {
+		if(shouldIgnoreJid(remoteJid) && remoteJid !== '@s.whatsapp.net') {
 			logger.debug({ remoteJid, id: node.attrs.id }, 'ignored notification')
+			await sendMessageAck(node)
+			return
+		}
+		if (shouldIgnoreOfflineMessages && node.attrs.type !== 'w:offline' || node.attrs.offline) {
+			logger.debug({ node }, 'ignored offline message')
 			await sendMessageAck(node)
 			return
 		}
@@ -704,11 +715,12 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			await sendMessageAck(node)
 			return
 		}
-		if (config.shouldIgnoreOfflineMessages) {
+		if (shouldIgnoreOfflineMessages && node.attrs.type !== 'w:offline' || node.attrs.offline) {
+			logger.debug({ node }, 'ignored offline message')
 			await sendMessageAck(node)
-			logger.debug({ key: node.attrs.key }, 'ignoring receipt for offline message')
 			return
 		}
+
 
 		const { fullMessage: msg, category, author, decrypt } = decryptMessageNode(
 			node,

@@ -66,6 +66,7 @@ export const makeSocket = (config: SocketConfig) => {
 		transactionOpts,
 		qrTimeout,
 		makeSignalRepository,
+		shouldIgnoreOfflineMessages
 	} = config
 
 	let url = typeof waWebSocketUrl === 'string' ? new URL(waWebSocketUrl) : waWebSocketUrl
@@ -702,7 +703,7 @@ export const makeSocket = (config: SocketConfig) => {
 		const child = getBinaryNodeChild(node, 'offline')
 		const offlineNotifs = +(child?.attrs.count || 0)
 
-		if (!config.shouldIgnoreOfflineMessages) logger.info(`handled ${offlineNotifs} offline messages/notifications`)
+		if (!shouldIgnoreOfflineMessages) logger.info(`handled ${offlineNotifs} offline messages/notifications`)
 		if(didStartBuffer) {
 			ev.flush()
 			logger.trace('flushed events for initial buffer')
