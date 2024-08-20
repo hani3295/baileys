@@ -123,6 +123,7 @@ export type SocketConfig = {
      * */
     shouldIgnoreOfflineMessages: boolean
 
+
     /** Socket passthrough */
     socket?: any
 }
