@@ -678,11 +678,6 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			await sendMessageAck(node)
 			return
 		}
-		if (shouldIgnoreOfflineMessages && node.attrs.type !== 'w:offline' || node.attrs.offline) {
-			logger.debug({ node }, 'ignored offline message')
-			await sendMessageAck(node)
-			return
-		}
 
 		await Promise.all([
 			processingMutex.mutex(
@@ -715,7 +710,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			await sendMessageAck(node)
 			return
 		}
-		if (shouldIgnoreOfflineMessages && node.attrs.type !== 'w:offline' || node.attrs.offline) {
+		if (shouldIgnoreOfflineMessages || node.attrs.offline) {
 			logger.debug({ node }, 'ignored offline message')
 			await sendMessageAck(node)
 			return
