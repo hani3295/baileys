@@ -212,11 +212,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			}
 		)
 	}
-	const handleNewsLetter = async(node: BinaryNode) => {
-		logger.info({ node }, 'recv news letter')
-		const id = node.attrs.server_id
-		
-	}
+
 
 	const handleEncryptNotification = async(node: BinaryNode) => {
 		const from = node.attrs.from
@@ -710,8 +706,8 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			await sendMessageAck(node)
 			return
 		}
-		if (shouldIgnoreOfflineMessages || node.attrs.offline) {
-			logger.debug({ node }, 'ignored offline message')
+		if (shouldIgnoreOfflineMessages && node.attrs.offline) {
+			logger.debug({ node }, 'ignored offline messages')
 			await sendMessageAck(node)
 			return
 		}

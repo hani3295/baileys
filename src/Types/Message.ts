@@ -200,7 +200,7 @@ type MinimalRelayOptions = {
     /** override the message ID with a custom provided string */
     messageId?: string
     /** cached group metadata, use to prevent redundant requests to WA & speed up msg sending */
-    cachedGroupMetadata?: (jid: string) => Promise<GroupMetadataParticipants | undefined>
+    useCachedGroupMetadata?: boolean
 }
 
 export type MessageRelayOptions = MinimalRelayOptions & {
@@ -257,6 +257,7 @@ export type MediaGenerationOptions = {
 }
 export type MessageContentGenerationOptions = MediaGenerationOptions & {
 	getUrlInfo?: (text: string) => Promise<WAUrlInfo | undefined>
+    getProfilePicUrl?: (jid: string, type: 'image' | 'preview') => Promise<string | undefined>
 }
 export type MessageGenerationOptions = MessageContentGenerationOptions & MessageGenerationOptionsFromContent
 

@@ -1,7 +1,7 @@
 import { Boom } from '@hapi/boom'
 import NodeCache from 'node-cache'
 import readline from 'readline'
-import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, makeCacheableSignalKeyStore, makeInMemoryStore, PHONENUMBER_MCC, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
+import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, makeCacheableSignalKeyStore, makeInMemoryStore, PHONENUMBER_MCC, prepareWAMessageMedia, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
 import MAIN_LOGGER from '../src/Utils/logger'
 import open from 'open'
 import { parsePhoneNumber } from "libphonenumber-js"
@@ -220,6 +220,7 @@ const startSock = async() => {
 
 				if(upsert.type === 'notify') {
 					for(const msg of upsert.messages) {
+						if (msg.key.id === '3EBO') return
 						
 					}
 				}

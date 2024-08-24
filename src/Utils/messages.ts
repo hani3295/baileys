@@ -98,6 +98,7 @@ const assertColor = async(color) => {
 	}
 }
 
+
 export const prepareWAMessageMedia = async(
 	message: AnyMediaMessageContent,
 	options: MediaGenerationOptions
@@ -119,6 +120,8 @@ export const prepareWAMessageMedia = async(
 		...message,
 		media: message[mediaType]
 	}
+
+	// check if we're dealing with a binary object
 	delete uploadData[mediaType]
 	// check if cacheable + generate cache key
 	const cacheableKey = typeof uploadData.media === 'object' &&
@@ -266,6 +269,7 @@ export const prepareWAMessageMedia = async(
 
 	return obj
 }
+
 
 export const prepareDisappearingMessageSettingContent = (ephemeralExpiration?: number) => {
 	ephemeralExpiration = ephemeralExpiration || 0
@@ -451,10 +455,7 @@ export const generateWAMessageContent = async(
 			)
 		}
 
-		m.messageContextInfo = {
-			// encKey
-			messageSecret: message.poll.messageSecret || randomBytes(32),
-		}
+
 
 		const pollCreationMessage = {
 			name: message.poll.name,

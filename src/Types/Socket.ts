@@ -7,6 +7,7 @@ import { proto } from '../../WAProto'
 import { AuthenticationState, SignalAuthState, TransactionCapabilityOptions } from './Auth'
 import { MediaConnInfo } from './Message'
 import { SignalRepository } from './Signal'
+import { GroupMetadata } from './GroupMetadata'
 
 export type WAVersion = [number, number, number]
 export type WABrowserDescription = [string, string, string]
@@ -121,7 +122,10 @@ export type SocketConfig = {
     /**
      * should ignore offline messages
      * */
-    shouldIgnoreOfflineMessages: boolean
+    shouldIgnoreOfflineMessages: boolean | undefined
+    /** cached group metadata, use to prevent redundant requests to WA & speed up msg sending */
+    cachedGroupMetadata: (jid: string) => Promise<GroupMetadata | undefined>
+
 
 
     /** Socket passthrough */
