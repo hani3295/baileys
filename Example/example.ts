@@ -4,6 +4,7 @@ import readline from 'readline'
 import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, makeCacheableSignalKeyStore, makeInMemoryStore, PHONENUMBER_MCC, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
 import MAIN_LOGGER from '../src/Utils/logger'
 import open from 'open'
+import { parsePhoneNumber } from "libphonenumber-js"
 import fs from 'fs'
 
 const logger = MAIN_LOGGER.child({})
@@ -72,8 +73,8 @@ const startSock = async() => {
 			registration.phoneNumber = await question('Please enter your mobile phone number:\n')
 		}
 
-		const libPhonenumber = await import("libphonenumber-js")
-		const phoneNumber = libPhonenumber.parsePhoneNumber(registration!.phoneNumber)
+
+		const phoneNumber = parsePhoneNumber(registration!.phoneNumber)
 		if(!phoneNumber?.isValid()) {
 			throw new Error('Invalid phone number: ' + registration!.phoneNumber)
 		}
