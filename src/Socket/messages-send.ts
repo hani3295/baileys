@@ -360,9 +360,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 							let groupData = cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined
 							if(groupData) {
 								logger.trace({ jid, participants: groupData.participants.length }, 'using cached group metadata')
-							}
-
-							if(!groupData && !isStatus) {
+							} else if(!isStatus) {
 								groupData = await groupMetadata(jid)
 							}
 
