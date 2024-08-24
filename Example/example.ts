@@ -10,7 +10,6 @@ const logger = MAIN_LOGGER.child({})
 logger.level = 'trace'
 
 const useStore = !process.argv.includes('--no-store')
-const doReplies = !process.argv.includes('--no-reply')
 const usePairingCode = process.argv.includes('--use-pairing-code')
 const useMobile = process.argv.includes('--mobile')
 
@@ -24,12 +23,7 @@ const question = (text: string) => new Promise<string>((resolve) => rl.question(
 
 // the store maintains the data of the WA connection in memory
 // can be written out to a file & read from it
-const store = useStore ? makeInMemoryStore({ logger }) : undefined
-store?.readFromFile('./baileys_store_multi.json')
-// save every 10s
-setInterval(() => {
-	store?.writeToFile('./baileys_store_multi.json')
-}, 10_000)
+
 
 // start a connection
 const startSock = async() => {
@@ -57,7 +51,7 @@ const startSock = async() => {
 		getMessage,
 	})
 
-	store?.bind(sock.ev)
+
 
 	// Pairing code for Web clients
 	if(usePairingCode && !sock.authState.creds.registered) {
@@ -216,24 +210,7 @@ const startSock = async() => {
 				await saveCreds()
 			}
 
-			if(events['labels.association']) {
-				console.log(events['labels.association'])
-			}
-
-
-			if(events['labels.edit']) {
-				console.log(events['labels.edit'])
-			}
-
-			if(events.call) {
-				console.log('recv call event', events.call)
-			}
-
-			// history received
-			if(events['messaging-history.set']) {
-				const { chats, contacts, messages, isLatest } = events['messaging-history.set']
-				console.log(`recv ${chats.length} chats, ${contacts.length} contacts, ${messages.length} msgs (is latest: ${isLatest})`)
-			}
+			
 
 			// received a new message
 			if(events['messages.upsert']) {
@@ -242,80 +219,19 @@ const startSock = async() => {
 
 				if(upsert.type === 'notify') {
 					for(const msg of upsert.messages) {
-						if(!msg.key.fromMe && doReplies) {
-							console.log('replying to', msg.key.remoteJid)
-							await sock!.readMessages([msg.key])
-							await sendMessageWTyping({ text: 'Hello there!' }, msg.key.remoteJid!)
-						}
+						
 					}
 				}
 			}
 
-			// messages updated like status delivered, message deleted etc.
-			if(events['messages.update']) {
-				console.log(
-					JSON.stringify(events['messages.update'], undefined, 2)
-				)
-
-				for(const { key, update } of events['messages.update']) {
-					if(update.pollUpdates) {
-						const pollCreation = await getMessage(key)
-						if(pollCreation) {
-							console.log(
-								'got poll update, aggregation: ',
-								getAggregateVotesInPollMessage({
-									message: pollCreation,
-									pollUpdates: update.pollUpdates,
-								})
-							)
-						}
-					}
-				}
-			}
-
-			if(events['message-receipt.update']) {
-				console.log(events['message-receipt.update'])
-			}
-
-			if(events['messages.reaction']) {
-				console.log(events['messages.reaction'])
-			}
-
-			if(events['presence.update']) {
-				console.log(events['presence.update'])
-			}
-
-			if(events['chats.update']) {
-				console.log(events['chats.update'])
-			}
-
-			if(events['contacts.update']) {
-				for(const contact of events['contacts.update']) {
-					if(typeof contact.imgUrl !== 'undefined') {
-						const newUrl = contact.imgUrl === null
-							? null
-							: await sock!.profilePictureUrl(contact.id!).catch(() => null)
-						console.log(
-							`contact ${contact.id} has a new profile pic: ${newUrl}`,
-						)
-					}
-				}
-			}
-
-			if(events['chats.delete']) {
-				console.log('chats deleted ', events['chats.delete'])
-			}
+			
 		}
 	)
 
 	return sock
 
 	async function getMessage(key: WAMessageKey): Promise<WAMessageContent | undefined> {
-		if(store) {
-			const msg = await store.loadMessage(key.remoteJid!, key.id!)
-			return msg?.message || undefined
-		}
-
+		
 		// only if store is present
 		return proto.Message.fromObject({})
 	}
