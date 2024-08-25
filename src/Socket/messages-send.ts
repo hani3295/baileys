@@ -308,8 +308,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		)
 		return { nodes, shouldIncludeDeviceIdentity }
 	}
-	const senderKeyJids: string[] = []
-	logger?.debug(senderKeyJids, 'got senderKeyJids')
+	
+
 	const relayMessage = async(
 		jid: string,
 		message: proto.IMessage,
