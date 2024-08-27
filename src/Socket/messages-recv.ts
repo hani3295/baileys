@@ -719,7 +719,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 	}
 
 	const handleMessage = async(node: BinaryNode) => {
-		if(node.attrs.offline) {
+		if(config.shouldIgnoreOfflineMessages && node.attrs.offline) {
 			logger.debug({ key: node.attrs.key }, 'ignoring offline message')
 			await sendMessageAck(node)
 			return
