@@ -2,7 +2,7 @@ import { Boom } from '@hapi/boom'
 import { Logger } from 'pino'
 import { proto } from '../../WAProto'
 import { SignalRepository, WAMessageKey } from '../Types'
-import { areJidsSameUser, BinaryNode, isJidBroadcast, isJidGroup, isJidNewsletter, isJidStatusBroadcast, isJidUser, isLidUser } from '../WABinary'
+import { areJidsSameUser, BinaryNode, binaryNodeToString, getBinaryNodeChild, isJidBroadcast, isJidGroup, isJidNewsletter, isJidStatusBroadcast, isJidUser, isLidUser } from '../WABinary'
 import { unpadRandomMax16 } from './generics'
 
 export const NO_MESSAGE_FOUND_ERROR_TEXT = 'Message absent from node'
@@ -160,7 +160,6 @@ export const decryptMessageNode = (
 							break
 						case 'pkmsg':
 						case 'msg':
-						case 'msmsg':
 							const user = isJidUser(sender) ? sender : author
 							msgBuffer = await repository.decryptMessage({
 								jid: user,
@@ -171,6 +170,12 @@ export const decryptMessageNode = (
 						case 'plaintext':
 							msgBuffer = content
 							break
+						case 'msmsg':
+							// TODO
+							const enc = binaryNodeToString(content)
+							msgBuffer = content
+							break
+						
 						default:
 							throw new Error(`Unknown e2e type: ${e2eType}`)
 						}
