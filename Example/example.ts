@@ -2,14 +2,14 @@ import { Boom } from '@hapi/boom'
 import NodeCache from 'node-cache'
 import readline from 'readline'
 import makeWASocket, { AnyMessageContent, BinaryInfo, delay, DisconnectReason, downloadAndProcessHistorySyncNotification, encodeWAM, fetchLatestBaileysVersion, getAggregateVotesInPollMessage, getHistoryMsg, isJidBroadcast, isJidNewsletter, makeCacheableSignalKeyStore, makeInMemoryStore, PHONENUMBER_MCC, proto, useMultiFileAuthState, WAMessageContent, WAMessageKey } from '../src'
-//import MAIN_LOGGER from '../src/Utils/logger'
+import MAIN_LOGGER from '../src/Utils/logger'
 import open from 'open'
 import fs, { readFileSync } from 'fs'
 import P, { pino } from 'pino'
 
 
-const logger = P({ timestamp: () => `,"time":"${new Date().toJSON()}"` }, P.destination('./wa-logs.txt'))
-logger.level = 'trace'
+const logger =	MAIN_LOGGER.child({})
+logger.level = 'info'
 
 const useStore = !process.argv.includes('--no-store')
 const doReplies = process.argv.includes('--do-reply')

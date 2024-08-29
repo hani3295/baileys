@@ -173,6 +173,7 @@ export const decryptMessageNode = (
 						case 'msmsg':
 							// TODO
 							const enc = binaryNodeToString(content)
+							console.log(enc)
 							msgBuffer = content
 							break
 						
@@ -192,6 +193,7 @@ export const decryptMessageNode = (
 								logger.error({ key: fullMessage.key, err }, 'failed to decrypt message')
 						        }
 						}
+						
 
 						if(fullMessage.message) {
 							Object.assign(fullMessage.message, msg)
