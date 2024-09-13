@@ -71,12 +71,12 @@ export const parseAndInjectE2ESessions = async(
 	repository: SignalRepository
 ) => {
 	const extractKey = (key: BinaryNode) => (
-		key ? ({
-			keyId: getBinaryNodeChildUInt(key, 'id', 3)!,
-			publicKey: generateSignalPubKey(getBinaryNodeChildBuffer(key, 'value')!)!,
-			signature: getBinaryNodeChildBuffer(key, 'signature')!,
-		}) : undefined
-	)
+        key ? {
+            keyId: getBinaryNodeChildUInt(key, 'id', 3)!,
+            publicKey: generateSignalPubKey(getBinaryNodeChildBuffer(key, 'value')!)!,
+            signature: getBinaryNodeChildBuffer(key, 'signature')!,
+        } : undefined
+    )
 	const nodes = getBinaryNodeChildren(getBinaryNodeChild(node, 'list'), 'user')
 	for(const node of nodes) {
 		assertNodeErrorFree(node)
@@ -89,29 +89,29 @@ export const parseAndInjectE2ESessions = async(
 	// It's rare case when you need to E2E sessions for so many users, but it's possible
 	const chunkSize = 100
 	const chunks = chunk(nodes, chunkSize)
-	for(const nodesChunk of chunks) {
-		await Promise.all(
-			nodesChunk.map(
-				async node => {
-					const signedKey = getBinaryNodeChild(node, 'skey')!
-					const key = getBinaryNodeChild(node, 'key')!
-					const identity = getBinaryNodeChildBuffer(node, 'identity')!
-					const jid = node.attrs.jid
-					const registrationId = getBinaryNodeChildUInt(node, 'registration', 4)
+	const processChunk = async (nodesChunk: BinaryNode[]) => {
+        for (const node of nodesChunk) {
+            const signedKey = getBinaryNodeChild(node, 'skey')!;
+            const key = getBinaryNodeChild(node, 'key')!;
+            const identity = getBinaryNodeChildBuffer(node, 'identity')!;
+            const jid = node.attrs.jid;
+            const registrationId = getBinaryNodeChildUInt(node, 'registration', 4);
 
-					await repository.injectE2ESession({
-						jid,
-						session: {
-							registrationId: registrationId!,
-							identityKey: generateSignalPubKey(identity),
-							signedPreKey: extractKey(signedKey)!,
-							preKey: extractKey(key)!
-						}
-					})
-				}
-			)
-		)
-	}
+            await repository.injectE2ESession({
+                jid,
+                session: {
+                    registrationId: registrationId!,
+                    identityKey: generateSignalPubKey(identity),
+                    signedPreKey: extractKey(signedKey)!,
+                    preKey: extractKey(key)!,
+                }
+            });
+        }
+    };
+
+    for (const nodesChunk of chunks) {
+        await processChunk(nodesChunk);
+    }
 }
 
 export const extractDeviceJids = (result: BinaryNode, myJid: string, excludeZeroDevices: boolean) => {
