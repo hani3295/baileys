@@ -1,1 +1,2 @@
-export * from './make-in-memory-store'
+import makeInMemoryStore from './make-in-memory-store'
+export { makeInMemoryStore }

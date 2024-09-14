@@ -49,7 +49,8 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 		retryRequestDelayMs,
 		maxMsgRetryCount,
 		getMessage,
-		shouldIgnoreJid
+		shouldIgnoreJid,
+		shouldIgnoreOfflineMessages
 	} = config
 	const sock = makeMessagesSocket(config)
 	const {
@@ -692,6 +693,11 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			await sendMessageAck(node)
 			return
 		}
+		if (shouldIgnoreOfflineMessages && node.attrs.offline) {
+			logger.debug({ key: node.attrs.key }, 'ignoring offline message')
+			await sendMessageAck(node)
+			return
+		}
 
 		await Promise.all([
 			processingMutex.mutex(
@@ -719,7 +725,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 	}
 
 	const handleMessage = async(node: BinaryNode) => {
-		if(config.shouldIgnoreOfflineMessages && node.attrs.offline) {
+		if(shouldIgnoreOfflineMessages && node.attrs.offline) {
 			logger.debug({ key: node.attrs.key }, 'ignoring offline message')
 			await sendMessageAck(node)
 			return

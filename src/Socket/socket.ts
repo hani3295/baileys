@@ -553,7 +553,7 @@ export const makeSocket = (config: SocketConfig) => {
 		return Buffer.concat([salt, randomIv, ciphered])
 	}
 
-	const sendWAMBuffer = (wamBuffer: Buffer) => {
+	/*const sendWAMBuffer = (wamBuffer: Buffer) => {
 		return query({
 			tag: 'iq',
 			attrs: {
@@ -569,7 +569,7 @@ export const makeSocket = (config: SocketConfig) => {
 				}
 			]
 		})
-	}
+	}*/
 
 	ws.on('message', onMessageReceived)
 
@@ -757,8 +757,7 @@ export const makeSocket = (config: SocketConfig) => {
 		requestPairingCode,
 		/** Waits for the connection to WA to reach a state */
 		waitForConnectionUpdate: bindWaitForConnectionUpdate(ev),
-		sendWAMBuffer,
-	}
+		}
 }
 
 /**

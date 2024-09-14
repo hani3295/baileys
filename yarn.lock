@@ -5267,7 +5267,7 @@ libphonenumber-js@^1.10.20:
 
 "libsignal@github:Skidy89/libsignal-node":
   version "2.0.1"
-  resolved "git+ssh://git@github.com/Skidy89/libsignal-node.git#c02f09aee8f42eb46b467c8d98b986de6b7031be"
+  resolved "git+ssh://git@github.com/Skidy89/libsignal-node.git#e17b64d3da9f3340044364c4d84e9cb082c6dddb"
   dependencies:
     curve25519-js "^0.0.4"
     protobufjs "6.8.8"
