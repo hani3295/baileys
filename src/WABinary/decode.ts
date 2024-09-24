@@ -42,7 +42,7 @@ export const decodeDecompressedBinaryNode = (
 
 	const readBytes = (n: number) => {
 		checkEOS(n)
-		const value = buffer.slice(indexRef.index, indexRef.index + n)
+		const value = buffer.subarray(indexRef.index, indexRef.index + n)
 		indexRef.index += n
 		return value
 	}

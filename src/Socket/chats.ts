@@ -225,7 +225,7 @@ export const makeChatsSocket = (config: SocketConfig) => {
 		await query({
 			tag: 'iq',
 			attrs: {
-				to: jidNormalizedUser(jid),
+				to: S_WHATSAPP_NET,
 				type: 'set',
 				xmlns: 'w:profile:picture'
 			},
@@ -236,7 +236,8 @@ export const makeChatsSocket = (config: SocketConfig) => {
 					content: img
 				}
 			]
-		})
+		}) 
+
 	}
 
 	/** remove the profile picture for yourself or a group */

@@ -204,8 +204,8 @@ export const decodeSyncdMutations = async(
 
 		const key = await getKey(record.keyId!.id!)
 		const content = Buffer.from(record.value!.blob!)
-		const encContent = content.slice(0, -32)
-		const ogValueMac = content.slice(-32)
+		const encContent = content.subarray(0, -32)
+		const ogValueMac = content.subarray(-32)
 		if(validateMacs) {
 			const contentHmac = generateMac(operation!, encContent, record.keyId!.id!, key.valueMacKey)
 			if(Buffer.compare(contentHmac, ogValueMac) !== 0) {
